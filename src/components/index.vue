@@ -4,7 +4,6 @@ import cityShow from "./cityShow.vue";
 import cityInfo from "./cityInfo.vue";
 import axios from "axios";
 import { ref } from "vue";
-defineEmits("sendCity");
 const citys = ref("");
 const cityGet = ref(null);
 const allCity = ref([]);
@@ -18,7 +17,8 @@ function changBG() {
   } else if (
     cityGet.value.current.condition.text == "Rainy" ||
     cityGet.value.current.condition.text == "Patchy light rain with thunder" ||
-    cityGet.value.current.condition.text == "Moderate or heavy rain shower"
+    cityGet.value.current.condition.text ==
+      "Moderate or heavy rain with thunder"
   ) {
     url.value = "./src/assets/rainy.jpg";
   } else if (cityGet.value.current.condition.text == "Sunny") {
@@ -29,11 +29,27 @@ function changBG() {
     url.value = "./src/assets/sunny.jpg";
   }
 }
-function sendCity(n) {
-  // debugger;
-  this.cityGet.value = this.n;
-  console.log(cityGet);
-}
+// function sendCity(n) {
+//   // debugger;
+//   this.cityGet.value = this.n;
+//   console.log(cityGet);
+// }
+const changeInfo = (n) => {
+  axios
+    .get(
+      "http://api.weatherapi.com/v1/current.json?key=2f727a76eebc4c6680374855232805&q=" +
+        n +
+        "&aqi=yes"
+    )
+    .then(function (response) {
+      cityGet.value = response.data;
+
+      console.log(emitCity);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+};
 function getCity() {
   axios
     .get(
@@ -86,7 +102,11 @@ function getCity() {
         </div>
         <!-- citys -->
         <city
-          @sendCity="'sendCity', sendCity(n)"
+          @sendCity="
+            (n) => {
+              changeInfo(n);
+            }
+          "
           v-for="(city, name, index) in allCity"
           :key="index"
           :name="city.name"
@@ -102,6 +122,7 @@ function getCity() {
             :wind_kph="cityGet.current.wind_kph"
             :humidity="cityGet.current.humidity"
             :cloud="cityGet.current.cloud"
+            :data="cityGet"
           />
           <div class="w-[88%] h-[2px] bg-slate-800 mx-2"></div>
         </div>
@@ -110,7 +131,6 @@ function getCity() {
     <!-- city info -->
     <cityInfo
       v-if="cityGet != null"
-
       :temp_c="cityGet.current.temp_c"
       :name="cityGet.location.name"
       :time="cityGet.location.localtime"

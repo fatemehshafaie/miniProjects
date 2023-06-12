@@ -16,10 +16,6 @@ const props = defineProps({
   type :Number,
   default: 50
   }
-  // temp_c :Number,
-  // wind_kph :Number,
-  // humidity :Number,
-  // cloud :Number,
 });
 </script>
 <template>
